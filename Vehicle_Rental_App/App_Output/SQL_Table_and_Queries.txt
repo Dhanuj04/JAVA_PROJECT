@@ -1,0 +1,110 @@
+Enter password: *********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 93
+Server version: 8.0.34 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use vehicledb;
+Database changed
+mysql> desc vehicledetails;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| VRegno       | varchar(20)  | NO   | PRI | NULL    |       |
+| Vcategory    | varchar(20)  | YES  |     | NULL    |       |
+| manufacturer | varchar(20)  | YES  |     | NULL    |       |
+| drent        | int          | YES  |     | NULL    |       |
+| mileage      | int          | YES  |     | NULL    |       |
+| fueltype     | varchar(20)  | YES  |     | NULL    |       |
+| description  | varchar(100) | YES  |     | NULL    |       |
+| RegDate      | date         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+
+mysql> desc customerdetails;
++-----------+-------------+------+-----+---------+----------------+
+| Field     | Type        | Null | Key | Default | Extra          |
++-----------+-------------+------+-----+---------+----------------+
+| CID       | int         | NO   | PRI | NULL    | auto_increment |
+| Cname     | varchar(40) | YES  |     | NULL    |                |
+| Ccategory | varchar(20) | YES  |     | NULL    |                |
+| CRegno    | varchar(20) | YES  | MUL | NULL    |                |
+| Fdate     | date        | YES  |     | NULL    |                |
+| Tdate     | date        | YES  |     | NULL    |                |
++-----------+-------------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from vehicledetails;
++---------------+-----------+---------------+-------+---------+----------+----------------+------------+
+| VRegno        | Vcategory | manufacturer  | drent | mileage | fueltype | description    | RegDate    |
++---------------+-----------+---------------+-------+---------+----------+----------------+------------+
+| AP-01-QW-2341 | Car       | BMW           |  5000 |       8 | Diesel   | Premium Car    | 2023-10-09 |
+| NL-01-A-1234  | Truck     | Volvo         | 15000 |      10 | Diesel   | Good Truck     | 2023-10-09 |
+| NL-22-D-3465  | Truck     | Bharat Benz   | 12000 |       9 | Diesel   | Heavy Truck    | 2023-10-09 |
+| TN-11-A-1111  | Bus       | Ashok Leyland | 11000 |      10 | Diesel   | Heavy Bus      | 2023-10-09 |
+| TN-12-D-4687  | Car       | Renault       |  2000 |      15 | Diesel   | Good Condition | 2023-10-09 |
+| TN-23-01-1243 | Bus       | Volvo         | 13000 |      16 | Diesel   | Smooth Vehicle | 2023-10-09 |
++---------------+-----------+---------------+-------+---------+----------+----------------+------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from customerdetails;
++-----+--------+-----------+--------------+------------+------------+
+| CID | Cname  | Ccategory | CRegno       | Fdate      | Tdate      |
++-----+--------+-----------+--------------+------------+------------+
+|  10 | Dhanuj | Car       | TN-12-D-4687 | 2023-10-10 | 2023-10-14 |
++-----+--------+-----------+--------------+------------+------------+
+1 row in set (0.00 sec)
+
+mysql> select VRegno from vehicledetails where vcategory = "Car";
++---------------+
+| VRegno        |
++---------------+
+| AP-01-QW-2341 |
+| TN-12-D-4687  |
++---------------+
+2 rows in set (0.00 sec)
+
+mysql> select VRegno from vehicledetails where vcategory = "Truck";
++--------------+
+| VRegno       |
++--------------+
+| NL-01-A-1234 |
+| NL-22-D-3465 |
++--------------+
+2 rows in set (0.00 sec)
+
+mysql> select VRegno from vehicledetails where vcategory = "Bus";
++---------------+
+| VRegno        |
++---------------+
+| TN-11-A-1111  |
+| TN-23-01-1243 |
++---------------+
+2 rows in set (0.00 sec)
+
+mysql> select drent*datediff(tdate,fdate) from vehicledetails left join customerdetails on vehicledetails.VRegno=customerdetails.CRegno where VRegno="TN-12-D-4687";
++-----------------------------+
+| drent*datediff(tdate,fdate) |
++-----------------------------+
+|                        8000 |
++-----------------------------+
+1 row in set (0.00 sec)
+
+mysql> select Vcategory,count(Vcategory),count(Ccategory),sum(drent*datediff(tdate,fdate)) from vehicledetails v left join customerdetails c on v.VRegno=c.CRegno where RegDate between "2023-10-01" and "2023-10-31" group by Vcategory;
++-----------+------------------+------------------+----------------------------------+
+| Vcategory | count(Vcategory) | count(Ccategory) | sum(drent*datediff(tdate,fdate)) |
++-----------+------------------+------------------+----------------------------------+
+| Car       |                2 |                1 |                             8000 |
+| Truck     |                2 |                0 |                             NULL |
+| Bus       |                2 |                0 |                             NULL |
++-----------+------------------+------------------+----------------------------------+
+3 rows in set (0.00 sec)
+
+mysql>
